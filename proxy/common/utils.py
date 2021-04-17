@@ -13,6 +13,7 @@ import contextlib
 import functools
 import ipaddress
 import socket
+import logging
 
 from types import TracebackType
 from typing import Optional, Dict, Any, List, Tuple, Type, Callable
@@ -156,10 +157,14 @@ def wrap_socket(conn: socket.socket, keyfile: str,
     ctx = ssl.create_default_context(
         ssl.Purpose.CLIENT_AUTH)
     ctx.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
-    ctx.verify_mode = ssl.CERT_NONE
+    ctx.verify_mode = ssl.CERT_REQUIRED
+    client_ca_cert_path = r"D:\Projects\proxy.py\my_certs\client-cert.pem"
+    logging.warning('I am loading utlis.wrap_socket')
+    ctx.load_verify_locations(cafile=client_ca_cert_path)
     ctx.load_cert_chain(
         certfile=certfile,
         keyfile=keyfile)
+    logging.warning('I am in utlis.wrap_socket')
     return ctx.wrap_socket(
         conn,
         server_side=True,
